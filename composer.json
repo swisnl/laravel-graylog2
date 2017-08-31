@@ -1,0 +1,48 @@
+{
+  "name": "swisnl/laravel-graylog2",
+  "description": "Log your Laravel application errors to Graylog2",
+  "keywords": ["laravel", "graylog", "logging"],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Wesley Elfring",
+      "email": "welfring@swis.nl",
+      "homepage": "https://www.swis.nl/over-ons/wesley-elfring",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Swis\\Graylog2\\": "src"
+    }
+  },
+  "require": {
+    "php": ">=5.6.0",
+    "graylog2/gelf-php": "^1.5",
+    "illuminate/http": "5.*",
+    "illuminate/support": "5.*",
+    "monolog/monolog": "^1.23"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^2.0"
+  },
+  "scripts": {
+    "check-style": [
+      "vendor/bin/php-cs-fixer fix --dry-run -v"
+    ],
+    "fix-style": [
+      "vendor/bin/php-cs-fixer fix"
+    ]
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Swis\\Graylog2\\Graylog2ServiceProvider"
+      ]
+    }
+  }
+}
