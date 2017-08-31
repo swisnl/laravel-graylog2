@@ -2,6 +2,7 @@
 
 namespace Swis\Graylog2;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class Graylog2ServiceProvider extends ServiceProvider
@@ -13,7 +14,7 @@ class Graylog2ServiceProvider extends ServiceProvider
     {
         // Publish configuration file
         $this->publishes([
-            __DIR__.'../config/graylog2.php' => $this->app->configPath().'/graylog2.php',
+            __DIR__.'/../config/graylog2.php' => $this->app->configPath().'/graylog2.php',
         ]);
     }
 
@@ -22,7 +23,12 @@ class Graylog2ServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->bind('graylog2', function ($app) {
+            return new Graylog2();
+        });
+
+        // Register handler
         $monoLog = Log::getMonolog();
-        $monoLog->pushHandler();
+        $monoLog->pushHandler(new Graylog2Handler());
     }
 }
