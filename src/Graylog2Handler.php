@@ -14,7 +14,7 @@ class Graylog2Handler extends AbstractHandler
     {
         // Check if we should send the message to Graylog2
         if (!config('graylog2.enabled')) {
-            return;
+            return false;
         }
 
         try {
