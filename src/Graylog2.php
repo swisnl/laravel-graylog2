@@ -27,7 +27,6 @@ class Graylog2 extends AbstractLogger
 
         // Setup transport
         if (config('graylog2.connection.type') === 'UDP') {
-
             $transport = new UdpTransport(
                 config('graylog2.connection.host'),
                 config('graylog2.connection.port'),
@@ -83,13 +82,11 @@ class Graylog2 extends AbstractLogger
         }
 
         // Add additionals from config
-        if (!empty(config('graylog2.additional_fields'))) {
-            foreach (config('graylog2.additional_fields') as $key => $value) {
+        if (!empty(config('graylog2.additional-fields'))) {
+            foreach (config('graylog2.additional-fields') as $key => $value) {
                 $message->setAdditional($key, $value);
             }
         }
-
-        dd($message);
 
         $this->logger->publishMessage($message);
     }

@@ -2,12 +2,17 @@
 
 return [
 
+    'enabled' => true,
+
+    // Log HTTP requests with exceptions
+    'log-requests' => true,
+
     'connection' => [
-        'host' => '',
-        'port' => '',
+        'host' => '127.0.0.1',
+        'port' => '12201',
         'type' => 'UDP',
 
-        // Check UdpTransport::CHUNK_SIZE_WAN
+        // Set to UdpTransport::CHUNK_SIZE_WAN as a default
         'chunk_size' => '1420',
     ],
 
@@ -21,7 +26,7 @@ return [
     ],
 
     // Allows you to set additional fields in the GELF message, use key => value
-    'additional_fields' => [
+    'additional-fields' => [
 
     ]
 ];
