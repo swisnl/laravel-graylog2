@@ -40,9 +40,9 @@ class Graylog2 extends AbstractLogger
         }
 
         // Setup publisher and logger
-        $publisher = new Publisher();
-        $publisher->addTransport($transport);
-        $this->logger = new Logger($publisher, $this->context['facility']);
+        $this->publisher = new Publisher();
+        $this->publisher->addTransport($transport);
+        $this->logger = new Logger($this->publisher, $this->context['facility']);
     }
 
     /**
