@@ -21,7 +21,6 @@ class Graylog2Handler extends AbstractHandler
             /** @var Graylog2 $graylog2 */
             $graylog2 = app('graylog2');
 
-
             $context = array_merge(
                 $record['context'],
                 [
@@ -30,7 +29,7 @@ class Graylog2Handler extends AbstractHandler
                 ]
             );
 
-            if (!config('graylog2.log-requests')) {
+            if (config('graylog2.log-requests')) {
                 $context['request'] = app('Illuminate\Http\Request');
             }
 
