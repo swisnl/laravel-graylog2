@@ -1,11 +1,11 @@
 <?php
 
 use Swis\Graylog2\Graylog2;
-use Swis\Graylog2\TestGraylog2Transport;
+
+include __DIR__ . '/TestGraylog2Transport.php';
 
 class Graylog2Test extends AbstractTest
 {
-
     /**
      * Tests adding additional transports.
      */
@@ -30,11 +30,12 @@ class Graylog2Test extends AbstractTest
     /**
      * Tests the generation of a GELF message.
      */
-    public function testMessageGeneration() {
+    public function testMessageGeneration()
+    {
         $graylog2 = new Graylog2();
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function(\Gelf\MessageInterface $message) use ($self) {
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
             $self->assertEquals('test', $message->getShortMessage());
             $self->assertEquals('error', $message->getLevel());
         });
@@ -47,16 +48,17 @@ class Graylog2Test extends AbstractTest
     /**
      * Tests the generation of a GELF message.
      */
-    public function testAdditionalFields() {
+    public function testAdditionalFields()
+    {
         // Set additional fields
         $this->app['config']->set('graylog2.additional-fields', [
-            'a' => 'b'
+            'a' => 'b',
         ]);
 
         $graylog2 = new Graylog2();
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function(\Gelf\MessageInterface $message) use ($self) {
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
             $self->assertEquals('b', $message->getAdditional('a'));
         });
 
@@ -67,32 +69,34 @@ class Graylog2Test extends AbstractTest
     /**
      * Tests the generation of a GELF message.
      */
-    public function testException() {
+    public function testException()
+    {
         // Set additional fields
         $graylog2 = new Graylog2();
 
         $e = new \Exception('test Exception', 300);
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function(\Gelf\MessageInterface $message) use ($self) {
-            $self->assertEquals('74', $message->getLine());
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
+            $self->assertEquals('77', $message->getLine());
         });
 
         $graylog2->addTransportToPublisher($testTransport);
         $graylog2->log('error', 'test', [
-            'exception' => $e
+            'exception' => $e,
         ]);
     }
 
     /**
-     * Tests the generation of a message with a request
+     * Tests the generation of a message with a request.
      */
-    public function testRequest() {
+    public function testRequest()
+    {
         // Set additional fields
         $graylog2 = new Graylog2();
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function(\Gelf\MessageInterface $message) use ($self) {
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
             $self->assertEquals('http://localhost', $message->getAdditional('request_url'));
             $self->assertEquals('GET', $message->getAdditional('request_method'));
             $self->assertEquals('127.0.0.1', $message->getAdditional('request_ip'));
@@ -100,19 +104,20 @@ class Graylog2Test extends AbstractTest
 
         $graylog2->addTransportToPublisher($testTransport);
         $graylog2->log('error', 'test', [
-            'request' => request()
+            'request' => request(),
         ]);
     }
 
     /**
-     * Tests the logging of a raw test message
+     * Tests the logging of a raw test message.
      */
-    public function testRawGelfMessage() {
+    public function testRawGelfMessage()
+    {
         // Set additional fields
         $graylog2 = new Graylog2();
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function(\Gelf\MessageInterface $message) use ($self) {
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
             $self->assertEquals('Test Message', $message->getShortMessage());
         });
 
