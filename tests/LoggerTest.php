@@ -42,6 +42,6 @@ class LoggerTest extends AbstractTest
 
         $this->assertArrayHasKey('file', $message);
         $this->assertEquals('Test Message', $message['short_message']);
-        $this->assertEquals('37', $message['line']);
+        $this->assertEquals('39', $message['line']);
     }
 }
