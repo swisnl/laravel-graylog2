@@ -2,7 +2,7 @@
 
 use Swis\Graylog2\Graylog2;
 
-include __DIR__ . '/TestGraylog2Transport.php';
+include __DIR__.'/TestGraylog2Transport.php';
 
 class Graylog2Test extends AbstractTest
 {
