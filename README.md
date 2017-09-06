@@ -3,7 +3,7 @@
 
 ## Installation
 
-1. Run composer require for this package: `composer require swisnl/laravel-graylog`
+1. Run composer require for this package: `composer require swisnl/laravel-graylog2`
 2. Add the service provider to app.php if you don't like auto discovery: `Swis\Graylog2\Graylog2ServiceProvider`
 3. Run `php artisan vendor:publish` to publish the config file to ./config/graylog2.php.
 4. Configure it to your liking
