@@ -70,10 +70,6 @@ class Graylog2 extends AbstractLogger
             $message->setHost($this->context['host']);
         }
 
-        if (!empty($this->context['version'])) {
-            $message->setVersion($this->context['version']);
-        }
-
         if (!empty($context['request']) && $context['request'] instanceof Request) {
             $message
                 ->setAdditional('request_url', $context['request']->url())

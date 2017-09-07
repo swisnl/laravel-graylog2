@@ -38,3 +38,8 @@ $message->setFacility('ICT');
 $message->setAdditional('employee', 'Maurice Moss');
 $graylog2->logMessage($message);
 ```
+
+## Troubleshooting
+
+### Long messages (or exceptions) won't show up in Graylog2
+You might need to increase the size of the UDP chunks in the UDP Transport (see the config file). Otherwise, you can send packets in TCP mode.
