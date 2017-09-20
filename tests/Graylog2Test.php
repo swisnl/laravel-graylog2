@@ -55,11 +55,10 @@ class Graylog2Test extends AbstractTest
         $graylog2->registerProcessor(new \Swis\Graylog2\Processor\ExceptionProcessor());
 
         $e = new \Exception('test Exception', 300);
-        $l = __LINE__;
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self, $l) {
-            $self->assertEquals($l, $message->getLine());
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self, $e) {
+            $self->assertEquals($e->getLine(), $message->getLine());
         });
 
         $graylog2->addTransportToPublisher($testTransport);
