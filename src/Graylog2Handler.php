@@ -17,29 +17,22 @@ class Graylog2Handler extends AbstractHandler
             return false;
         }
 
+        // Handle a log from Laravel
+        /** @var Graylog2 $graylog2 */
+        $graylog2 = app('graylog2');
+
         try {
-            /** @var Graylog2 $graylog2 */
-            $graylog2 = app('graylog2');
-
-            $context = array_merge(
-                $record['context'],
-                [
-                    'extra'   => $record['extra'],
-                    'channel' => $record['channel'],
-                ]
-            );
-
-            if (config('graylog2.log-requests')) {
-                $context['request'] = app('Illuminate\Http\Request');
-            }
-
             $graylog2->log(
                 strtolower($record['level_name']),
                 $record['message'],
-                $context
+                $record['context']
             );
+
+            return true;
         } catch (\Exception $e) {
-            Log::error('Cannot log the error to Graylog2.');
+            Log::info('Could not log to Graylog.');
+
+            return false;
         }
     }
 }

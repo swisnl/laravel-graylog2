@@ -48,43 +48,22 @@ class Graylog2Test extends AbstractTest
     /**
      * Tests the generation of a GELF message.
      */
-    public function testAdditionalFields()
-    {
-        // Set additional fields
-        $this->app['config']->set('graylog2.additional-fields', [
-            'a' => 'b',
-        ]);
-
-        $graylog2 = new Graylog2();
-
-        $self = $this;
-        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
-            $self->assertEquals('b', $message->getAdditional('a'));
-        });
-
-        $graylog2->addTransportToPublisher($testTransport);
-        $graylog2->log('error', 'test', []);
-    }
-
-    /**
-     * Tests the generation of a GELF message.
-     */
     public function testException()
     {
         // Set additional fields
         $graylog2 = new Graylog2();
+        $graylog2->registerProcessor(new \Swis\Graylog2\Processor\ExceptionProcessor());
 
         $e = new \Exception('test Exception', 300);
+        $l = __LINE__;
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
-            $self->assertEquals('77', $message->getLine());
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self, $l) {
+            $self->assertEquals($l, $message->getLine());
         });
 
         $graylog2->addTransportToPublisher($testTransport);
-        $graylog2->log('error', 'test', [
-            'exception' => $e,
-        ]);
+        $graylog2->logException($e);
     }
 
     /**
@@ -94,6 +73,7 @@ class Graylog2Test extends AbstractTest
     {
         // Set additional fields
         $graylog2 = new Graylog2();
+        $graylog2->registerProcessor(new \Swis\Graylog2\Processor\RequestProcessor());
 
         $self = $this;
         $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
@@ -126,6 +106,6 @@ class Graylog2Test extends AbstractTest
         $message = new \Gelf\Message();
         $message->setShortMessage('Test Message');
 
-        $graylog2->logMessage($message);
+        $graylog2->logGelfMessage($message);
     }
 }

@@ -7,8 +7,8 @@ use Gelf\Publisher;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\TransportInterface;
 use Gelf\Transport\UdpTransport;
-use Illuminate\Http\Request;
 use Psr\Log\AbstractLogger;
+use Swis\Graylog2\Processor\ProcessorInterface;
 
 class Graylog2 extends AbstractLogger
 {
@@ -18,14 +18,104 @@ class Graylog2 extends AbstractLogger
     /** @var Publisher */
     protected $publisher;
 
-    protected $context = [];
+    /** @var ProcessorInterface[] */
+    protected $processors = [];
 
     public function __construct()
     {
-        // Setup context for later use
-        $this->context = config('graylog2.context');
+        $this->setupGraylogTransport();
+    }
 
-        // Setup transport
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed  $level
+     * @param string $message
+     * @param array  $context
+     */
+    public function log($level, $message, array $context = [])
+    {
+        $gelfMessage = $this->logger->prepareLog($level, $message, $context);
+        $gelfMessage = $this->invokeProcessors($gelfMessage);
+        $this->logger->publishMessage($gelfMessage);
+    }
+
+    /**
+     * @param \Exception $exception
+     */
+    public function logException(\Exception $exception)
+    {
+        // Set short-message as it is a requirement
+        $message = new Message();
+        $message->setShortMessage(substr($exception->getMessage(), 0, 100));
+
+        $message = $this->invokeProcessors($message, $exception);
+        $this->logger->publishMessage($message);
+    }
+
+    /**
+     * @param Message $message
+     */
+    public function logGelfMessage(Message $message)
+    {
+        $message = $this->invokeProcessors($message);
+        $this->logger->publishMessage($message);
+    }
+
+    /**
+     * Allows for additional transports to be added to the publisher.
+     *
+     * @param TransportInterface $transport
+     */
+    public function addTransportToPublisher(TransportInterface $transport)
+    {
+        $this->publisher->addTransport($transport);
+    }
+
+    /**
+     * Set's the default facility on the logger/transport.
+     *
+     * @param $facility
+     */
+    public function setFacility($facility)
+    {
+        $this->logger->setFacility($facility);
+    }
+
+    /**
+     * Allows you to refine the message before sending it to Graylog.
+     * You could add a callback to add the current user or other
+     * runtime info to the message.
+     *
+     * @param callable           $callback
+     * @param ProcessorInterface $processor
+     */
+    public function registerProcessor(ProcessorInterface $processor)
+    {
+        $this->processors[] = $processor;
+    }
+
+    /**
+     * @param Message $message
+     * @param null    $exception
+     *
+     * @return Message
+     */
+    private function invokeProcessors(Message $message, $exception = null)
+    {
+        foreach ($this->processors as $processor) {
+            $message = $processor->process($message, $exception);
+        }
+
+        return $message;
+    }
+
+    /**
+     * Setup Graylog transport.
+     */
+    private function setupGraylogTransport()
+    {
+        // Setup the transport
         if (config('graylog2.connection.type') === 'UDP') {
             $transport = new UdpTransport(
                 config('graylog2.connection.host'),
@@ -42,58 +132,6 @@ class Graylog2 extends AbstractLogger
         // Setup publisher and logger
         $this->publisher = new Publisher();
         $this->publisher->addTransport($transport);
-        $this->logger = new Logger($this->publisher, $this->context['facility']);
-    }
-
-    /**
-     * Allows for additional transports to be added to the publisher.
-     *
-     * @param TransportInterface $transport
-     */
-    public function addTransportToPublisher(TransportInterface $transport)
-    {
-        $this->publisher->addTransport($transport);
-    }
-
-    /**
-     * Send a message to Graylog.
-     *
-     * @param string $level
-     * @param string $message
-     * @param array  $context
-     */
-    public function log($level, $message, array $context = [])
-    {
-        $message = $this->logger->prepareLog($level, $message, $context);
-
-        if (!empty($this->context['host'])) {
-            $message->setHost($this->context['host']);
-        }
-
-        if (!empty($context['request']) && $context['request'] instanceof Request) {
-            $message
-                ->setAdditional('request_url', $context['request']->url())
-                ->setAdditional('request_method', $context['request']->method())
-                ->setAdditional('request_ip', $context['request']->ip());
-        }
-
-        // Add additionals from config
-        if (!empty(config('graylog2.additional-fields'))) {
-            foreach (config('graylog2.additional-fields') as $key => $value) {
-                $message->setAdditional($key, $value);
-            }
-        }
-
-        $this->logger->publishMessage($message);
-    }
-
-    /**
-     * Log an already constructed GELF message.
-     *
-     * @param Message $message
-     */
-    public function logMessage(Message $message)
-    {
-        $this->logger->publishMessage($message);
+        $this->logger = new Logger($this->publisher);
     }
 }

@@ -23,12 +23,20 @@ class Graylog2ServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('graylog2', function ($app) {
-            return new Graylog2();
-        });
+        $this->app->singleton('graylog2', Graylog2::class);
 
         // Register handler
         $monoLog = Log::getMonolog();
         $monoLog->pushHandler(new Graylog2Handler());
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return ['graylog2'];
     }
 }
