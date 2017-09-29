@@ -8,10 +8,10 @@ return [
     'log_requests' => true,
 
     // Log HTTP Request GET data
-    'log_request_get_data' => true,
+    'log_request_get_data' => false,
 
     // Log HTTP Request POST data
-    'log_request_post_data' => true,
+    'log_request_post_data' => false,
 
     // Filter out some sensitive post parameters
     'disallowed_post_parameters' => ['password', 'username'],

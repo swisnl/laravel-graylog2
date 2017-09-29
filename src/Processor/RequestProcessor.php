@@ -30,8 +30,6 @@ class RequestProcessor implements ProcessorInterface
 
         // Add GET data if configured
         if (config('graylog2.log_request_get_data', false)) {
-
-            //dd($request);
             $message->setAdditional('request_get_data', json_encode($request->query()));
         }
 
@@ -39,7 +37,7 @@ class RequestProcessor implements ProcessorInterface
         if (config('graylog2.log_request_post_data', false)) {
             $disallowedParameters = config('graylog2.disallowed_post_parameters', []);
             $filteredParameters = array_filter(
-                $_POST,
+                $request->request->all(),
                 function ($key) use ($disallowedParameters) {
                     return !in_array($key, $disallowedParameters);
                 },

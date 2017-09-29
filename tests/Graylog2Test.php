@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Config;
 use Swis\Graylog2\Facades\Graylog2;
 
 include __DIR__.'/TestGraylog2Transport.php';
@@ -99,20 +100,29 @@ class Graylog2Test extends AbstractTest
         Graylog2::logGelfMessage($message);
     }
 
-    public function testHttpProcessorGetParameters() {
+    public function testRequestProcessorParameters() {
         Graylog2::registerProcessor(new \Swis\Graylog2\Processor\RequestProcessor());
 
         $self = $this;
         $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
-            $self->assertEquals('[]', $message->getAdditional('request_get_data'));
+            $self->assertEquals('{"test":true}', $message->getAdditional('request_get_data'));
+            $self->assertEquals('{"test_post":true}', $message->getAdditional('request_post_data'));
             $self->assertEquals('http://localhost', $message->getAdditional('request_url'));
             $self->assertEquals('GET', $message->getAdditional('request_method'));
             $self->assertEquals('127.0.0.1', $message->getAdditional('request_ip'));
         });
         Graylog2::addTransportToPublisher($testTransport);
 
+        // Enable get and post data logging
+        Config::set('graylog2.log_request_get_data', true);
+        Config::set('graylog2.log_request_post_data', true);
+
         $request = request();
         $request->query->set('test', true);
+        $request->request->set('test_post', true);
+
+        // Check if we filter out the username
+        $request->request->set('username', 'henk');
 
         Graylog2::log('error', 'test', []);
     }
