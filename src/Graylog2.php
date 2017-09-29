@@ -103,6 +103,7 @@ class Graylog2 extends AbstractLogger
     /**
      * @param Message $message
      * @param null    $exception
+     * @param mixed   $context
      *
      * @return Message
      */

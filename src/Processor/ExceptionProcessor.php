@@ -9,6 +9,7 @@ class ExceptionProcessor implements ProcessorInterface
      *
      * @param \Gelf\Message   $message
      * @param \Exception|null $exception
+     * @param mixed           $context
      *
      * @return mixed
      */

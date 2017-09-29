@@ -11,6 +11,7 @@ interface ProcessorInterface
      *
      * @param Message         $message
      * @param \Exception|null $exception
+     * @param mixed           $context
      *
      * @return Message
      */

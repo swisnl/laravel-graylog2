@@ -100,7 +100,8 @@ class Graylog2Test extends AbstractTest
         Graylog2::logGelfMessage($message);
     }
 
-    public function testRequestProcessorParameters() {
+    public function testRequestProcessorParameters()
+    {
         Graylog2::registerProcessor(new \Swis\Graylog2\Processor\RequestProcessor());
 
         $self = $this;
