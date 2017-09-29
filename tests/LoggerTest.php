@@ -28,20 +28,4 @@ class LoggerTest extends AbstractTest
             $message
         );
     }
-
-    /**
-     * Test the preparation of an exception.
-     */
-    public function testExceptionPreparation()
-    {
-        $logger = new \Swis\Graylog2\Logger();
-
-        $exception = new \Exception('Test', 300);
-
-        $message = $logger->prepareLog('emergency', 'Test Message', ['exception' => $exception])->toArray();
-
-        $this->assertArrayHasKey('file', $message);
-        $this->assertEquals('Test Message', $message['short_message']);
-        $this->assertEquals('39', $message['line']);
-    }
 }

@@ -11,8 +11,7 @@ class HandlerTest extends AbstractTest
     public function testEnabling()
     {
         $handler = new Graylog2Handler();
-
-        $this->assertNull($handler->handle([]));
+        $this->assertFalse($handler->handle([]));
 
         $this->app['config']->set('graylog2.enabled', false);
         $this->assertFalse($handler->handle([]));
