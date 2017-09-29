@@ -14,25 +14,39 @@ class RequestProcessor implements ProcessorInterface
      *
      * @return mixed
      */
-    public function process($message, $exception)
+    public function process($message, $exception, $context)
     {
         // Don't process when the setting is off
         if (!config('graylog2.log_requests', false)) {
             return $message;
         }
 
-        // Check for a request in the context or a request from Laravel
-
         /** @var Request $request */
-        $request = null;
-        if (!empty($context['request']) && $context['request'] instanceof Request) {
-            $request = $context['request'];
-        } else {
-            $request = app('Illuminate\Http\Request');
-        }
+        $request = app('Illuminate\Http\Request');
 
         if (!$request) {
             return $message;
+        }
+
+        // Add GET data if configured
+        if (config('graylog2.log_request_get_data', false)) {
+
+            //dd($request);
+            $message->setAdditional('request_get_data', json_encode($request->query()));
+        }
+
+        // Add filtered POST data if configured
+        if (config('graylog2.log_request_post_data', false)) {
+            $disallowedParameters = config('graylog2.disallowed_post_parameters', []);
+            $filteredParameters = array_filter(
+                $_POST,
+                function ($key) use ($disallowedParameters) {
+                    return !in_array($key, $disallowedParameters);
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+
+            $message->setAdditional('request_post_data', json_encode($filteredParameters));
         }
 
         return $message

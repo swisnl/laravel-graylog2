@@ -36,7 +36,12 @@ class Graylog2 extends AbstractLogger
     public function log($level, $message, array $context = [])
     {
         $gelfMessage = $this->logger->prepareLog($level, $message, $context);
-        $gelfMessage = $this->invokeProcessors($gelfMessage);
+        $exception = null;
+        if (array_key_exists('exception', $context)) {
+            $exception = $context['exception'];
+        }
+
+        $gelfMessage = $this->invokeProcessors($gelfMessage, $exception, $context);
         $this->logger->publishMessage($gelfMessage);
     }
 
@@ -101,10 +106,10 @@ class Graylog2 extends AbstractLogger
      *
      * @return Message
      */
-    private function invokeProcessors(Message $message, $exception = null)
+    private function invokeProcessors(Message $message, $exception = null, $context = [])
     {
         foreach ($this->processors as $processor) {
-            $message = $processor->process($message, $exception);
+            $message = $processor->process($message, $exception, $context);
         }
 
         return $message;

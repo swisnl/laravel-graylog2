@@ -12,7 +12,7 @@ class ExceptionProcessor implements ProcessorInterface
      *
      * @return mixed
      */
-    public function process($message, $exception)
+    public function process($message, $exception, $context)
     {
         // Don't process the log when there is no Exception
         if ($exception === null) {

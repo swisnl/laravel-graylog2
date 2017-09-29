@@ -14,5 +14,5 @@ interface ProcessorInterface
      *
      * @return Message
      */
-    public function process($message, $exception);
+    public function process($message, $exception, $context);
 }
