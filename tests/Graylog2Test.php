@@ -1,6 +1,7 @@
 <?php
 
-use Swis\Graylog2\Graylog2;
+use Illuminate\Support\Facades\Config;
+use Swis\Graylog2\Facades\Graylog2;
 
 include __DIR__.'/TestGraylog2Transport.php';
 
@@ -11,20 +12,18 @@ class Graylog2Test extends AbstractTest
      */
     public function testTransport()
     {
-        $graylog2 = new Graylog2();
-
         // Mock the null transport and add it to the transport stack in the publisher
         $transportStub = $this->getMockBuilder(\Gelf\Transport\TcpTransport::class)
             ->setMethods(['send'])
             ->getMock();
-        $graylog2->addTransportToPublisher($transportStub);
+        Graylog2::addTransportToPublisher($transportStub);
 
         // Expect the stub to be called
         $transportStub->expects($this->once())
             ->method('send')
             ->with($this->isInstanceOf(\Gelf\Message::class));
 
-        $graylog2->log('emergency', 'test', []);
+        Graylog2::log('emergency', 'test', []);
     }
 
     /**
@@ -32,38 +31,14 @@ class Graylog2Test extends AbstractTest
      */
     public function testMessageGeneration()
     {
-        $graylog2 = new Graylog2();
-
         $self = $this;
         $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
             $self->assertEquals('test', $message->getShortMessage());
             $self->assertEquals('error', $message->getLevel());
         });
 
-        $graylog2->addTransportToPublisher($testTransport);
-
-        $graylog2->log('error', 'test', []);
-    }
-
-    /**
-     * Tests the generation of a GELF message.
-     */
-    public function testAdditionalFields()
-    {
-        // Set additional fields
-        $this->app['config']->set('graylog2.additional-fields', [
-            'a' => 'b',
-        ]);
-
-        $graylog2 = new Graylog2();
-
-        $self = $this;
-        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
-            $self->assertEquals('b', $message->getAdditional('a'));
-        });
-
-        $graylog2->addTransportToPublisher($testTransport);
-        $graylog2->log('error', 'test', []);
+        Graylog2::addTransportToPublisher($testTransport);
+        Graylog2::log('error', 'test', []);
     }
 
     /**
@@ -72,19 +47,17 @@ class Graylog2Test extends AbstractTest
     public function testException()
     {
         // Set additional fields
-        $graylog2 = new Graylog2();
+        Graylog2::registerProcessor(new \Swis\Graylog2\Processor\ExceptionProcessor());
 
         $e = new \Exception('test Exception', 300);
 
         $self = $this;
-        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
-            $self->assertEquals('77', $message->getLine());
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self, $e) {
+            $self->assertEquals($e->getLine(), $message->getLine());
         });
 
-        $graylog2->addTransportToPublisher($testTransport);
-        $graylog2->log('error', 'test', [
-            'exception' => $e,
-        ]);
+        Graylog2::addTransportToPublisher($testTransport);
+        Graylog2::logException($e);
     }
 
     /**
@@ -93,7 +66,7 @@ class Graylog2Test extends AbstractTest
     public function testRequest()
     {
         // Set additional fields
-        $graylog2 = new Graylog2();
+        Graylog2::registerProcessor(new \Swis\Graylog2\Processor\RequestProcessor());
 
         $self = $this;
         $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
@@ -102,8 +75,8 @@ class Graylog2Test extends AbstractTest
             $self->assertEquals('127.0.0.1', $message->getAdditional('request_ip'));
         });
 
-        $graylog2->addTransportToPublisher($testTransport);
-        $graylog2->log('error', 'test', [
+        Graylog2::addTransportToPublisher($testTransport);
+        Graylog2::log('error', 'test', [
             'request' => request(),
         ]);
     }
@@ -114,18 +87,44 @@ class Graylog2Test extends AbstractTest
     public function testRawGelfMessage()
     {
         // Set additional fields
-        $graylog2 = new Graylog2();
-
         $self = $this;
         $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
             $self->assertEquals('Test Message', $message->getShortMessage());
         });
 
-        $graylog2->addTransportToPublisher($testTransport);
+        Graylog2::addTransportToPublisher($testTransport);
 
         $message = new \Gelf\Message();
         $message->setShortMessage('Test Message');
 
-        $graylog2->logMessage($message);
+        Graylog2::logGelfMessage($message);
+    }
+
+    public function testRequestProcessorParameters()
+    {
+        Graylog2::registerProcessor(new \Swis\Graylog2\Processor\RequestProcessor());
+
+        $self = $this;
+        $testTransport = new TestGraylog2Transport(function (\Gelf\MessageInterface $message) use ($self) {
+            $self->assertEquals('{"test":true}', $message->getAdditional('request_get_data'));
+            $self->assertEquals('{"test_post":true}', $message->getAdditional('request_post_data'));
+            $self->assertEquals('http://localhost', $message->getAdditional('request_url'));
+            $self->assertEquals('GET', $message->getAdditional('request_method'));
+            $self->assertEquals('127.0.0.1', $message->getAdditional('request_ip'));
+        });
+        Graylog2::addTransportToPublisher($testTransport);
+
+        // Enable get and post data logging
+        Config::set('graylog2.log_request_get_data', true);
+        Config::set('graylog2.log_request_post_data', true);
+
+        $request = request();
+        $request->query->set('test', true);
+        $request->request->set('test_post', true);
+
+        // Check if we filter out the username
+        $request->request->set('username', 'henk');
+
+        Graylog2::log('error', 'test', []);
     }
 }
