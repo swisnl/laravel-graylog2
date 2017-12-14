@@ -122,7 +122,7 @@ class Graylog2 extends AbstractLogger
     private function setupGraylogTransport()
     {
         // Setup the transport
-        if (config('graylog2.connection.type') === 'UDP') {
+        if ('UDP' === config('graylog2.connection.type')) {
             $transport = new UdpTransport(
                 config('graylog2.connection.host'),
                 config('graylog2.connection.port'),
