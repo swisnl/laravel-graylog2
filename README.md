@@ -13,18 +13,57 @@
 The default settings enable logging of exceptions. It will add the HTTP request to the GELF message, but it will not add POST values. Check the graylog2.log-requests config to enable or disable this behavior.
 
 ## Message Processors 
-Processors add extra functionality to the handler. You can register processors adding this to your AppServiceProvider:
+Processors add extra functionality to the handler. You can register processors by modifying the AppServiceProvider:
 ```php
+public function register()
+{
+    //...
     Graylog2::registerProcessor(new \Swis\Graylog2\Processor\ExceptionProcessor());
+    Graylog2::registerProcessor(new \Swis\Graylog2\Processor\RequestProcessor());
+    Graylog2::registerProcessor(new MyCustomProcessor());
+    //...
+}
 ```
-In the default package, the following processors are available:
-### ExceptionProcessor
+
+The following processors are available by default:
+
+**ExceptionProcessor**
+
 Adds exception data to the message if there is any.
-### RequestProcessor
+
+**RequestProcessor**
+
 Adds the current Laravel Request to the message. It adds the url, method and ip by default.
 
-### Don't report exceptions
-In `app/Exceptions/Handler.php` you can define the $dontReport array with Exception classes that won't be reported to the logger. For example, you can blacklist the \Illuminate\Database\Eloquent\ModelNotFoundException. Check the [Laravel Documentation](https://laravel.com/docs/5.4/errors#the-exception-handler) about errors for more information.
+## Custom processors
+You can define a custom processor by implementing `Swis\Graylog2\Processor\ProcessorInterface`. The result should look something like this:
+
+```php
+<?php
+
+namespace App\Processors;
+
+use Auth;
+use Swis\Graylog2\Processor\ProcessorInterface;
+
+class MyCustomProcessor implements ProcessorInterface
+{
+    public function process($message, $exception, $context)
+    {
+        $message->setAdditional('domain', config('app.url'));
+
+        if (Auth::user()) {
+            $message->setAdditional('user_id', Auth::id());
+        }
+
+        return $message;
+    }
+}
+
+```
+
+## Don't report exceptions
+In `app/Exceptions/Handler.php` you can define the $dontReport array with Exception classes that won't be reported to the logger. For example, you can blacklist the \Illuminate\Database\Eloquent\ModelNotFoundException. Check the [Laravel Documentation](https://laravel.com/docs/master/errors#the-exception-handler) about errors for more information.
 
 ## Logging arbitrary data
 You can instantiate the Graylog2 class to send additional GELF messages:
@@ -32,7 +71,6 @@ You can instantiate the Graylog2 class to send additional GELF messages:
 ```php
 // Send default log message
 Graylog2::log('emergency', 'Dear Sir/Madam, Fire! Fire! Help me!. 123 Cavendon Road. Looking forward to hearing from you. Yours truly, Maurice Moss.', ['facility' => 'ICT']);
-
 
 // Send custom GELF Message
 $message = new \Gelf\Message();
