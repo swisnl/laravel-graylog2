@@ -16,7 +16,7 @@ class ExceptionProcessor implements ProcessorInterface
     public function process($message, $exception, $context)
     {
         // Don't process the log when there is no Exception
-        if ($exception === null) {
+        if (null === $exception) {
             return $message;
         }
 
