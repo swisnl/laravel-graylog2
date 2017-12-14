@@ -28,7 +28,7 @@ class Graylog2Handler extends AbstractHandler
                 $record['context']
             );
 
-            return true;
+            return false;
         } catch (\Exception $e) {
             Log::info('Could not log to Graylog.');
 
