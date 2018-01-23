@@ -27,6 +27,12 @@ return [
     'connection' => [
         'host' => '127.0.0.1',
         'port' => '12201',
+
+        /*
+         * Choose between UDP and TCP transport. 
+         * UDP transports won't throw exceptions on transport errors,
+         * but message reception by the Graylog server is not guaranteed.
+         */
         'type' => 'UDP',
 
         // Set to UdpTransport::CHUNK_SIZE_LAN as a default
