@@ -122,17 +122,19 @@ class Graylog2 extends AbstractLogger
     private function setupGraylogTransport()
     {
         // Setup the transport
-        if ('UDP' === config('graylog2.connection.type')) {
+        if ('UDP' === strtoupper(config('graylog2.connection.type'))) {
             $transport = new UdpTransport(
                 config('graylog2.connection.host'),
                 config('graylog2.connection.port'),
                 config('graylog2.connection.chunk_size')
             );
-        } else {
+        } elseif ('TCP' === strtoupper(config('graylog2.connection.type'))) {
             $transport = new TcpTransport(
                 config('graylog2.connection.host'),
                 config('graylog2.connection.port')
             );
+        } else {
+            throw new \DomainException('Invalid Graylog Transport, should be set to TCP or UDP.');
         }
 
         // Setup publisher and logger
