@@ -4,6 +4,8 @@ return [
 
     'enabled' => true,
 
+    'log_level' => 'debug',
+
     // Log HTTP requests with exceptions
     'log_requests' => true,
 

@@ -12,6 +12,9 @@
 ## Logging exceptions
 The default settings enable logging of exceptions. It will add the HTTP request to the GELF message, but it will not add POST values. Check the graylog2.log-requests config to enable or disable this behavior.
 
+## Minimum log level
+You can adjust the minimum log level by changing the value `log_level`in configuration.
+
 ## Message Processors 
 Processors add extra functionality to the handler. You can register processors by modifying the AppServiceProvider:
 ```php
