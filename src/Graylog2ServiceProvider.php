@@ -27,7 +27,7 @@ class Graylog2ServiceProvider extends ServiceProvider
 
         // Register handler
         $monoLog = Log::getMonolog();
-        $monoLog->pushHandler(new Graylog2Handler(), config('graylog2.log_level', 'debug'));
+        $monoLog->pushHandler(new Graylog2Handler(config('graylog2.log_level', 'debug')));
     }
 
     /**
