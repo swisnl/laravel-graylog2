@@ -127,4 +127,14 @@ class Graylog2Test extends AbstractTest
 
         Graylog2::log('error', 'test', []);
     }
+
+    /**
+     * Tests checking the Graylog transport configuration value.
+     */
+    public function testInvalidTransportConfiguration()
+    {
+        Config::set('graylog2.connection.type', 'INVALID');
+        $this->expectException(\DomainException::class);
+        Graylog2::log('emergency', 'test', []);
+    }
 }
