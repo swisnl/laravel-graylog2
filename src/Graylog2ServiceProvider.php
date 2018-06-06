@@ -14,8 +14,10 @@ class Graylog2ServiceProvider extends ServiceProvider
     {
         // Publish configuration file
         $this->publishes([
-            __DIR__.'/../config/graylog2.php' => $this->app->configPath().'/graylog2.php',
+            __DIR__.'/../config/graylog2.php' => base_path('config/graylog2.php'),
         ]);
+
+        $this->mergeConfigFrom(__DIR__.'/../config/graylog2.php', 'graylog2');
     }
 
     /**
@@ -26,8 +28,16 @@ class Graylog2ServiceProvider extends ServiceProvider
         $this->app->singleton('graylog2', Graylog2::class);
 
         // Register handler
-        $monoLog = Log::getMonolog();
+        $monoLog = $this->logger();
         $monoLog->pushHandler(new Graylog2Handler(config('graylog2.log_level', 'debug')));
+    }
+
+    /**
+     * @return \Monolog\Logger
+     */
+    protected function logger()
+    {
+        return app('log');
     }
 
     /**
