@@ -7,9 +7,6 @@ use Illuminate\Support\ServiceProvider;
 
 class Graylog2ServiceProvider extends ServiceProvider
 {
-    
-    protected $defer = true;
-    
     /**
      * Bootstrap the application events.
      */
