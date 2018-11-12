@@ -1,8 +1,10 @@
 # Graylog2 Logging for Laravel 5.x
-[![License](https://poser.pugx.org/swisnl/textsnippet/license)](https://packagist.org/packages/swisnl/laravel-graylog) [![Build Status](https://travis-ci.org/swisnl/laravel-graylog2.svg?branch=master)](https://travis-ci.org/swisnl/laravel-graylog2)
+[![License](https://poser.pugx.org/swisnl/textsnippet/license)](https://packagist.org/packages/swisnl/laravel-graylog) [![Build Status](https://travis-ci.org/swisnl/laravel-graylog2.svg?branch=master)](https://travis-ci.org/swisnl/laravel-graylog2) [![Made by SWIS](https://img.shields.io/badge/%F0%9F%9A%80-made%20by%20SWIS-%23D9021B.svg)](https://www.swis.nl)
+
+## *Unmaintained*
+*This project is no longer actively developed and we are looking for a new maintainer. If you are interested, please contact us.* 
 
 ## Installation
-
 1. Run composer require for this package: `composer require swisnl/laravel-graylog2`
 2. Add the service provider to app.php if you don't like auto discovery: `Swis\Graylog2\Graylog2ServiceProvider`
 3. Run `php artisan vendor:publish` to publish the config file to ./config/graylog2.php.
