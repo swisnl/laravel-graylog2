@@ -1,5 +1,5 @@
 # Graylog2 Logging for Laravel 5.x
-[![License](https://poser.pugx.org/swisnl/textsnippet/license)](https://packagist.org/packages/swisnl/laravel-graylog) [![Build Status](https://travis-ci.org/swisnl/laravel-graylog2.svg?branch=master)](https://travis-ci.org/swisnl/laravel-graylog2) [![Made by SWIS](https://img.shields.io/badge/%F0%9F%9A%80-made%20by%20SWIS-%23D9021B.svg)](https://www.swis.nl)
+[![License](https://poser.pugx.org/swisnl/textsnippet/license)](https://packagist.org/packages/swisnl/laravel-graylog) [![Build Status](https://travis-ci.org/swisnl/laravel-graylog2.svg?branch=master)](https://travis-ci.org/swisnl/laravel-graylog2) [![Made by SWIS](https://img.shields.io/badge/%F0%9F%9A%80-made%20by%20SWIS-%230737A9.svg)](https://www.swis.nl)
 
 ## *Unmaintained*
 *This project is no longer actively developed and we are looking for a new maintainer. If you are interested, please contact us.* 
