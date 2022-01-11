@@ -1,8 +1,9 @@
 # Graylog2 Logging for Laravel 5.x
 [![License](https://poser.pugx.org/swisnl/textsnippet/license)](https://packagist.org/packages/swisnl/laravel-graylog) [![Build Status](https://travis-ci.org/swisnl/laravel-graylog2.svg?branch=master)](https://travis-ci.org/swisnl/laravel-graylog2) [![Made by SWIS](https://img.shields.io/badge/%F0%9F%9A%80-made%20by%20SWIS-%230737A9.svg)](https://www.swis.nl)
 
-## *Unmaintained*
-*This project is no longer actively developed and we are looking for a new maintainer. If you are interested, please contact us.* 
+🚨 **THIS PACKAGE HAS BEEN ABANDONED** 🚨
+
+We don't use this package anymore in our own projects and cannot justify the time needed to maintain it anymore. That's why we have chosen to abandon it. Feel free to fork our code and maintain your own copy or use one of the many alternatives.
 
 ## Installation
 1. Run composer require for this package: `composer require swisnl/laravel-graylog2`
